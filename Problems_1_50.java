@@ -1145,8 +1145,8 @@ public class Problems_1_50 {
         return true;
     }
 
-    private Set<Integer> panDigitalNumbers = new HashSet<Integer>();
-    public void generatePanDigitalNumbers(int number, int[] digits) {
+    private Set<Long> panDigitalNumbers = new HashSet<Long>();
+    public void generatePanDigitalNumbers(long number, int[] digits) {
         int digitsLeft = 0;
         for (int digit : digits) {
             if (digit != -1) {
@@ -1163,7 +1163,10 @@ public class Problems_1_50 {
             }
             int temp = digits[i];
             digits[i] = -1;
-            int tempNumber = number + (int)Math.pow(10, digitsLeft-1)*temp;
+            long tempNumber = number + (long)Math.pow(10, digitsLeft-1)*temp;
+            /*if (temp == 0) {
+                tempNumber = number * 10;
+            }*/
             generatePanDigitalNumbers(tempNumber, digits);
             digits[i] = temp;
         }
@@ -1174,20 +1177,20 @@ public class Problems_1_50 {
         int[] multiplicandSize = {1,2,3,4};
         int[] multiplierSize = {4,3,2,1};
 
-        Set<Integer> truePanDigitalNumbers = new HashSet<Integer>();
-        for (int i : panDigitalNumbers) {
-            int number = i;
+        Set<Long> truePanDigitalNumbers = new HashSet<Long>();
+        for (long i : panDigitalNumbers) {
+            long number = i;
             //System.out.println(number);
             for (int k = 0; k < multiplicandSize.length; k++ ) {
                 int factor1 = (int)Math.pow(10,(9-multiplicandSize[k]));
-                int multiplicand = number / factor1;
+                long multiplicand = number / factor1;
                 //System.out.println("Multiplicand: " + multiplicand);
                 int factor2 = (int)Math.pow(10,(9-multiplicandSize[k] - multiplierSize[k]));
-                int multiplier = number / factor2;
+                long multiplier = number / factor2;
                 int factor3 = (int)Math.pow(10, multiplierSize[k]);
                 multiplier = multiplier % factor3;
                 //System.out.println("Multiplier: " + multiplier);
-                int product = number % factor2;
+                long product = number % factor2;
                 //System.out.println("Product: " + product);
                 if (multiplicand * multiplier == product) {
                     System.out.println(multiplicand + "x" + multiplier + "=" + product);
@@ -1195,7 +1198,7 @@ public class Problems_1_50 {
                 }
             }
         }
-        for (int number : truePanDigitalNumbers) {
+        for (long number : truePanDigitalNumbers) {
             sum += number;
         }
         return sum;
@@ -1608,14 +1611,14 @@ public class Problems_1_50 {
         return constant;
     }
 
-    public int largestPanDigitalPrime() {
+    public long largestPanDigitalPrime() {
         int[] digits = new int[] {1,2,3,4,5,6,7,8,9};
         for (int i = digits.length - 1; i > 1; i-- ) {
             panDigitalNumbers.clear();
             generatePanDigitalNumbers(0, digits);
             //System.out.println(panDigitalNumbers.size());
-            int maxPrime = 0;
-            for (int number : panDigitalNumbers) {
+            long maxPrime = 0;
+            for (long number : panDigitalNumbers) {
                 if (number > maxPrime && isPrime(number)) {
                     maxPrime = number;
                 }
@@ -1628,9 +1631,74 @@ public class Problems_1_50 {
         return 0;
     }
 
+    public long getCodedTriangleNumbers() {
+        long count = 0;
+        Set<Integer> triangleNumbers = new HashSet<Integer>();
+        for (int i = 1; i <= 10000; i++) {
+            triangleNumbers.add((i*(i+1))/2);
+        }
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader("c:\\topcoder-java\\Euler\\p042_words.txt"));
+            StringBuffer wordBuffer = new StringBuffer();
+            String line = reader.readLine();
+            while (line != null) {
+                wordBuffer.append(line);
+                line = reader.readLine();
+            }
+            String wordFile = wordBuffer.toString();
+            String[] words = wordFile.split("\\,");
+            for (String word : words) {
+                word = word.replace("\"", "");
+                int charSum = 0;
+                for (int i = 0; i < word.length(); i++) {
+                    charSum += word.charAt(i) - 'A' + 1;
+                }
+                if (triangleNumbers.contains(charSum)) {
+                    count++;
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println("Error: " + ex.getMessage());
+        }
+        return count;
+
+    }
+
+    public long findSubstringDivisiblePandigitalNumbers() {
+        long sum = 0;
+
+        int[] digits = new int[] {0,1,2,3,4,5,6,7,8,9};
+
+        panDigitalNumbers.clear();
+        generatePanDigitalNumbers(0, digits);
+
+        int[] primeDivisors = new int[] {2,3,5,7,11,13,17};
+        main:
+        for (long panDigital : panDigitalNumbers) {
+            int tenModuloDivisor = 1000000000;
+            int tenDivisor = 1000000;
+            if (panDigital < 1000000000) {  //if it is only a nine digit number, the first digit being 0
+
+            }
+            for (int i = 0; i < primeDivisors.length; i++) {
+                long subString = (panDigital % tenModuloDivisor);
+                subString  /= tenDivisor;
+                if (subString % primeDivisors[i] != 0) {
+                    continue main;
+                }
+                tenModuloDivisor /= 10;
+                tenDivisor /= 10;
+            }
+            System.out.println(panDigital);
+            sum += panDigital;
+        }
+
+        return sum;
+    }
+
     public static void main(String[] args) {
         Problems_1_50 p = new Problems_1_50();
-        System.out.println(p.largestPanDigitalPrime());
+        System.out.println(p.findSubstringDivisiblePandigitalNumbers());
     }
 }
         /*
